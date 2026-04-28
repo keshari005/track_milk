@@ -14,7 +14,6 @@
 
         h2 {
             text-align: center;
-            margin-bottom: 15px;
         }
 
         .item {
@@ -34,7 +33,7 @@
         }
 
         .price {
-            font-size: 14px;
+            font-size: 13px;
             color: gray;
         }
 
@@ -55,9 +54,10 @@
         }
 
         .qty {
-            width: 40px;
+            width: 50px;
             text-align: center;
             font-size: 16px;
+            padding: 5px;
         }
 
         .total {
@@ -120,7 +120,7 @@ data.forEach((item, i) => {
 
             <div class="controls">
                 <button class="btn" onclick="changeQty(${i}, -1)">-</button>
-                <input type="number" id="q${i}" class="qty" value="0" readonly>
+                <input type="number" id="q${i}" class="qty" value="0" min="0" oninput="calculate()">
                 <button class="btn" onclick="changeQty(${i}, 1)">+</button>
             </div>
         </div>
@@ -129,7 +129,7 @@ data.forEach((item, i) => {
 
 function changeQty(i, change) {
     let input = document.getElementById(`q${i}`);
-    let value = parseInt(input.value) || 0;
+    let value = parseFloat(input.value) || 0;
 
     value += change;
     if (value < 0) value = 0;
@@ -177,9 +177,7 @@ function printBill() {
     const iframe = document.createElement("iframe");
     document.body.appendChild(iframe);
 
-    iframe.style.position = "absolute";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
+    iframe.style.display = "none";
 
     iframe.contentWindow.document.open();
     iframe.contentWindow.document.write(printContent);
@@ -197,4 +195,4 @@ function resetAll() {
 </script>
 
 </body>
-</html> 
+</html>
