@@ -47,19 +47,40 @@
             color: #00ffcc;
         }
 
+        /* 🔥 FIXED CONTROLS */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
         .btn {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             font-size: 16px;
-            border-radius: 50%;
+            border-radius: 6px;
             border: none;
             background: #00ffcc;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .btn:active {
+            transform: scale(0.9);
         }
 
         .qty {
-            width: 40px;
+            width: 45px;
+            height: 30px;
             text-align: center;
             font-size: 14px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: #000;
+            color: #fff;
         }
 
         .total {
@@ -67,9 +88,10 @@
             text-align: center;
             margin-top: 10px;
             color: #00ffcc;
+            font-weight: bold;
         }
 
-        button {
+        button.main {
             width: 100%;
             padding: 10px;
             margin-top: 6px;
@@ -95,19 +117,18 @@
     Total: ₹ <span id="total">0.00</span>
 </div>
 
-<button class="print-btn" onclick="printBill()">🧾 Print Bill</button>
-<button class="reset-btn" onclick="resetAll()">Reset</button>
+<button class="main print-btn" onclick="printBill()">🧾 Print Bill</button>
+<button class="main reset-btn" onclick="resetAll()">Reset</button>
 
 <script>
 
-// Set Date UI
+// Date show
 function setDate() {
-    const now = new Date();
-    document.getElementById("date").innerText = now.toLocaleString();
+    document.getElementById("date").innerText = new Date().toLocaleString();
 }
 setDate();
 
-// Data
+// Items
 const data = [
     {name: "Full Cream", price: 68},
     {name: "Cow", price: 58},
@@ -122,7 +143,7 @@ const data = [
 
 const container = document.getElementById("items");
 
-// Load Items
+// Load items
 data.forEach((item, i) => {
     container.innerHTML += `
         <div class="item">
@@ -131,8 +152,8 @@ data.forEach((item, i) => {
                 <div class="price">₹${item.price}</div>
             </div>
 
-            <div>
-                <button class="btn" onclick="changeQty(${i}, -1)">-</button>
+            <div class="controls">
+                <button class="btn" onclick="changeQty(${i}, -1)">−</button>
                 <input type="number" id="q${i}" class="qty" value="0" oninput="calculate()">
                 <button class="btn" onclick="changeQty(${i}, 1)">+</button>
             </div>
@@ -140,7 +161,7 @@ data.forEach((item, i) => {
     `;
 });
 
-// Change Qty
+// Change qty
 function changeQty(i, change) {
     let el = document.getElementById(`q${i}`);
     let val = parseFloat(el.value) || 0;
@@ -160,11 +181,10 @@ function calculate() {
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
-// Print Bill (ONE PAGE FIX)
+// Print (single page + date fix)
 function printBill() {
     let now = new Date().toLocaleString();
     let total = 0;
-
     let rows = "";
 
     data.forEach((item, i) => {
@@ -187,7 +207,7 @@ function printBill() {
             body { font-family: Arial; padding: 10px; }
             h3 { text-align:center; margin:5px; }
             table { width:100%; border-collapse: collapse; font-size:14px; }
-            td, th { border-bottom:1px dashed #000; padding:4px; text-align:left; }
+            td, th { border-bottom:1px dashed #000; padding:4px; }
             .total { font-weight:bold; font-size:16px; }
         </style>
     </head>
