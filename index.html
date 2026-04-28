@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Milk Shop Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body { 
+            font-family: Arial; 
+            padding: 15px; 
+            background: #f5f5f5; 
+        }
+
+        h2 { 
+            text-align: center; 
+        }
+
+        .item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        input { 
+            width: 70px; 
+            padding: 5px; 
+        }
+
+        .total { 
+            font-size: 22px; 
+            text-align: center; 
+            margin-top: 20px; 
+            color: green; 
+            font-weight: bold;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .print-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .reset-btn {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>🥛 Milk Shop</h2>
+
+<div id="items"></div>
+
+<div class="total">
+    Total: ₹ <span id="total">0.00</span>
+</div>
+
+<button class="print-btn" onclick="printBill()">🧾 Print Bill</button>
+<button class="reset-btn" onclick="resetAll()">🔄 Reset</button>
+
+<script>
+const data = [
+    {name: "Full Cream", price: 68},
+    {name: "Cow", price: 58},
+    {name: "Choti Dahi", price: 9},
+    {name: "Badi Dahi", price: 33},
+    {name: "Plain Lassi", price: 9.5},
+    {name: "Tadka Lassi", price: 9.5},
+    {name: "Sweet Lassi", price: 9.5},
+    {name: "Baccha Dudh", price: 9},
+    {name: "Botal Lassi", price: 18}
+];
+
+const container = document.getElementById("items");
+
+// Load items
+data.forEach((item, i) => {
+    container.innerHTML += `
+        <div class="item">
+            <span>${item.name} (₹${item.price})</span>
+            <input type="number" min="0" step="1" id="q${i}" oninput="calculate()">
+        </div>`;
+});
+
+// Calculate total
+function calculate() {
+    let total = 0;
+
+    data.forEach((item, i) => {
+        let qty = parseFloat(document.getElementById(`q${i}`).value) || 0;
+        total += qty * item.price;
+    });
+
+    document.getElementById("total").innerText = total.toFixed(2);
+}
+
+// Print bill (FIXED VERSION)
+function printBill() {
+    let bill = "Milk Shop Bill\n\n";
+    let total = 0;
+
+    data.forEach((item, i) => {
+        let qty = parseFloat(document.getElementById(`q${i}`).value) || 0;
+
+        if (qty > 0) {
+            let amt = qty * item.price;
+            bill += `${item.name} x ${qty} = ₹${amt}\n`;
+            total += amt;
+        }
+    });
+
+    bill += "\nTotal: ₹" + total.toFixed(2);
+
+    const printContent = `
+        <html>
+        <body>
+        <h3>Milk Shop Bill</h3>
+        <pre>${bill}</pre>
+        </body>
+        </html>
+    `;
+
+    const iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+
+    iframe.style.position = "absolute";
+    iframe.style.width = "0px";
+    iframe.style.height = "0px";
+    iframe.style.border = "none";
+
+    iframe.contentWindow.document.open();
+    iframe.contentWindow.document.write(printContent);
+    iframe.contentWindow.document.close();
+
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+}
+
+// Reset all
+function resetAll() {
+    data.forEach((item, i) => {
+        document.getElementById(`q${i}`).value = "";
+    });
+
+    calculate();
+}
+</script>
+
+</body>
+</html>
