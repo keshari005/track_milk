@@ -5,64 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
-        body { 
-            font-family: Arial; 
-            padding: 15px; 
-            background: #f5f5f5; 
+        body {
+            font-family: Arial;
+            margin: 0;
+            padding: 10px;
+            background: #f2f2f2;
         }
 
-        h2 { 
-            text-align: center; 
+        h2 {
+            text-align: center;
+        }
+
+        .date {
+            text-align: center;
+            font-size: 14px;
+            color: gray;
+            margin-bottom: 10px;
         }
 
         .item {
             background: white;
-            padding: 10px;
+            padding: 12px;
             margin-bottom: 10px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        input { 
-            width: 70px; 
-            padding: 5px; 
-        }
-
-        .total { 
-            font-size: 22px; 
-            text-align: center; 
-            margin-top: 20px; 
-            color: green; 
+        .name {
+            font-size: 16px;
             font-weight: bold;
         }
 
-        button {
+        .price {
+            font-size: 13px;
+            color: gray;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .btn {
+            width: 35px;
+            height: 35px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            margin: 0 5px;
+        }
+
+        .qty {
+            width: 60px;
+            text-align: center;
+            font-size: 16px;
+            padding: 5px;
+        }
+
+        .total {
+            font-size: 22px;
+            text-align: center;
+            margin-top: 15px;
+            color: green;
+            font-weight: bold;
+        }
+
+        button.main {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin-top: 10px;
             font-size: 16px;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            border-radius: 10px;
         }
 
-        .print-btn {
-            background: #4CAF50;
-            color: white;
-        }
-
-        .reset-btn {
-            background: #f44336;
-            color: white;
-        }
+        .print-btn { background: #4CAF50; color: white; }
+        .reset-btn { background: #f44336; color: white; }
     </style>
 </head>
 
 <body>
 
-<h2>🥛 Milk Shop</h2>
+<h2>Sonu 🥛 Milk Shop</h2>
+
+<div class="date">
+    Date: <span id="date"></span>
+</div>
 
 <div id="items"></div>
 
@@ -70,34 +103,64 @@
     Total: ₹ <span id="total">0.00</span>
 </div>
 
-<button class="print-btn" onclick="printBill()">🧾 Print Bill</button>
-<button class="reset-btn" onclick="resetAll()">🔄 Reset</button>
+<button class="main print-btn" onclick="printBill()">🧾 Print Bill</button>
+<button class="main reset-btn" onclick="resetAll()">🔄 Reset</button>
 
 <script>
+
+// Set Date & Time
+function setDate() {
+    const now = new Date();
+    document.getElementById("date").innerText = now.toLocaleString();
+}
+setDate();
+
 const data = [
-    {name: "Full Cream", price: 68},
-    {name: "Cow", price: 58},
-    {name: "Choti Dahi", price: 9},
-    {name: "Badi Dahi", price: 33},
-    {name: "Plain Lassi", price: 9.5},
-    {name: "Tadka Lassi", price: 9.5},
-    {name: "Sweet Lassi", price: 9.5},
-    {name: "Baccha Dudh", price: 9},
-    {name: "Botal Lassi", price: 18}
+    {name: "Full Cream (KG)", price: 68},
+    {name: "Cow (KG)", price: 58},
+    {name: "Choti Dahi (KG)", price: 45},
+    {name: "Medium Dahi (KG)", price: 90},
+    {name: "Badi Dahi (KG)", price: 66},
+    {name: "Plain Lassi (KG)", price: 19},
+    {name: "Tadka Lassi (KG)", price: 19},
+    {name: "Sweet Lassi (KG)", price: 19},
+    {name: "Baccha Dudh (KG)", price: 45},
+    {name: "Botal Lassi (per piece)", price: 18}
 ];
 
 const container = document.getElementById("items");
 
-// Load items
+// Load Items
 data.forEach((item, i) => {
     container.innerHTML += `
         <div class="item">
-            <span>${item.name} (₹${item.price})</span>
-            <input type="number" min="0" step="1" id="q${i}" oninput="calculate()">
-        </div>`;
+            <div>
+                <div class="name">${item.name}</div>
+                <div class="price">₹${item.price}</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" onclick="changeQty(${i}, -1)">-</button>
+                <input type="number" id="q${i}" class="qty" value="0" min="0" step="0.5" inputmode="decimal" oninput="calculate()">
+                <button class="btn" onclick="changeQty(${i}, 1)">+</button>
+            </div>
+        </div>
+    `;
 });
 
-// Calculate total
+// Change Qty
+function changeQty(i, change) {
+    let input = document.getElementById(`q${i}`);
+    let value = parseFloat(input.value) || 0;
+
+    value += change;
+    if (value < 0) value = 0;
+
+    input.value = value;
+    calculate();
+}
+
+// Calculate Total
 function calculate() {
     let total = 0;
 
@@ -109,9 +172,10 @@ function calculate() {
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
-// Print bill (FIXED VERSION)
+// Print Bill
 function printBill() {
-    let bill = "Milk Shop Bill\n\n";
+    let now = new Date().toLocaleString();
+    let bill = "Milk Shop Bill\nDate: " + now + "\n\n";
     let total = 0;
 
     data.forEach((item, i) => {
@@ -130,6 +194,7 @@ function printBill() {
         <html>
         <body>
         <h3>Milk Shop Bill</h3>
+        <p>Date: ${now}</p>
         <pre>${bill}</pre>
         </body>
         </html>
@@ -138,27 +203,23 @@ function printBill() {
     const iframe = document.createElement("iframe");
     document.body.appendChild(iframe);
 
-    iframe.style.position = "absolute";
-    iframe.style.width = "0px";
-    iframe.style.height = "0px";
-    iframe.style.border = "none";
+    iframe.style.display = "none";
 
     iframe.contentWindow.document.open();
     iframe.contentWindow.document.write(printContent);
     iframe.contentWindow.document.close();
 
-    iframe.contentWindow.focus();
     iframe.contentWindow.print();
 }
 
-// Reset all
+// Reset
 function resetAll() {
     data.forEach((item, i) => {
-        document.getElementById(`q${i}`).value = "";
+        document.getElementById(`q${i}`).value = 0;
     });
-
     calculate();
 }
+
 </script>
 
 </body>

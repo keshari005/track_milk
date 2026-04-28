@@ -9,29 +9,32 @@
             font-family: Arial;
             margin: 0;
             padding: 10px;
-            background: #f2f2f2;
+            background: #121212;
+            color: #fff;
         }
 
         h2 {
             text-align: center;
+            color: #00ffcc;
         }
 
         .date {
             text-align: center;
-            font-size: 14px;
-            color: gray;
-            margin-bottom: 10px;
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 15px;
         }
 
         .item {
-            background: white;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 12px;
+            background: #1e1e1e;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 14px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            border: 1px solid rgba(0,255,204,0.15);
         }
 
         .name {
@@ -40,8 +43,10 @@
         }
 
         .price {
-            font-size: 13px;
-            color: gray;
+            font-size: 14px;
+            color: #00ffcc;
+            font-weight: bold;
+            margin-top: 4px;
         }
 
         .controls {
@@ -50,28 +55,32 @@
         }
 
         .btn {
-            width: 35px;
-            height: 35px;
+            width: 38px;
+            height: 38px;
             font-size: 18px;
             border: none;
             border-radius: 50%;
-            background: #2196F3;
-            color: white;
-            margin: 0 5px;
+            background: #00ffcc;
+            color: black;
+            margin: 0 6px;
+            font-weight: bold;
         }
 
         .qty {
             width: 60px;
             text-align: center;
             font-size: 16px;
-            padding: 5px;
+            padding: 6px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
         }
 
         .total {
-            font-size: 22px;
+            font-size: 24px;
             text-align: center;
-            margin-top: 15px;
-            color: green;
+            margin-top: 20px;
+            color: #00ffcc;
             font-weight: bold;
         }
 
@@ -81,11 +90,19 @@
             margin-top: 10px;
             font-size: 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
+            font-weight: bold;
         }
 
-        .print-btn { background: #4CAF50; color: white; }
-        .reset-btn { background: #f44336; color: white; }
+        .print-btn {
+            background: linear-gradient(45deg, #00ffcc, #00cc99);
+            color: black;
+        }
+
+        .reset-btn {
+            background: #ff4444;
+            color: white;
+        }
     </style>
 </head>
 
@@ -108,13 +125,14 @@
 
 <script>
 
-// Set Date & Time
+// Date set
 function setDate() {
     const now = new Date();
     document.getElementById("date").innerText = now.toLocaleString();
 }
 setDate();
 
+// Data
 const data = [
     {name: "Full Cream (KG)", price: 68},
     {name: "Cow (KG)", price: 58},
@@ -130,7 +148,7 @@ const data = [
 
 const container = document.getElementById("items");
 
-// Load Items
+// Load items
 data.forEach((item, i) => {
     container.innerHTML += `
         <div class="item">
@@ -141,14 +159,14 @@ data.forEach((item, i) => {
 
             <div class="controls">
                 <button class="btn" onclick="changeQty(${i}, -1)">-</button>
-                <input type="number" id="q${i}" class="qty" value="0" min="0" step="0.5" inputmode="decimal" oninput="calculate()">
+                <input type="number" id="q${i}" class="qty" value="0" min="0" step="0.5" oninput="calculate()">
                 <button class="btn" onclick="changeQty(${i}, 1)">+</button>
             </div>
         </div>
     `;
 });
 
-// Change Qty
+// Change qty
 function changeQty(i, change) {
     let input = document.getElementById(`q${i}`);
     let value = parseFloat(input.value) || 0;
@@ -160,7 +178,7 @@ function changeQty(i, change) {
     calculate();
 }
 
-// Calculate Total
+// Calculate total
 function calculate() {
     let total = 0;
 
@@ -172,7 +190,7 @@ function calculate() {
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
-// Print Bill
+// Print bill
 function printBill() {
     let now = new Date().toLocaleString();
     let bill = "Milk Shop Bill\nDate: " + now + "\n\n";
@@ -192,8 +210,8 @@ function printBill() {
 
     const printContent = `
         <html>
-        <body>
-        <h3>Milk Shop Bill</h3>
+        <body style="font-family:Arial;">
+        <h3>Sonu Milk Shop</h3>
         <p>Date: ${now}</p>
         <pre>${bill}</pre>
         </body>
@@ -202,7 +220,6 @@ function printBill() {
 
     const iframe = document.createElement("iframe");
     document.body.appendChild(iframe);
-
     iframe.style.display = "none";
 
     iframe.contentWindow.document.open();
