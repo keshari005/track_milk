@@ -2,9 +2,7 @@
 <html>
 <head>
     <title>Milk Shop Calculator</title>
-
-    <!-- 🔥 Zoom Fix -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <style>
         body {
@@ -19,7 +17,6 @@
             text-align: center;
             color: #00ffcc;
             font-size: 18px;
-            margin: 5px 0;
         }
 
         .date {
@@ -34,25 +31,16 @@
             padding: 8px;
             margin-bottom: 6px;
             border-radius: 10px;
-
-            /* 🔥 KEY FIX */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 8px;
         }
 
-        .left {
-            flex: 1; /* text flexible */
-            min-width: 0;
-        }
+        .left { flex: 1; }
 
         .name {
             font-size: 13px;
             font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis; /* 🔥 text कटेगा नहीं */
         }
 
         .price {
@@ -78,10 +66,7 @@
         .qty {
             width: 42px;
             height: 28px;
-
-            /* 🔥 ZOOM FIX */
             font-size: 16px;
-
             text-align: center;
             border-radius: 6px;
             border: 1px solid #444;
@@ -96,7 +81,7 @@
             color: #00ffcc;
         }
 
-        button.main {
+        button {
             width: 100%;
             padding: 10px;
             margin-top: 6px;
@@ -107,13 +92,27 @@
 
         .print-btn { background: #00cc99; }
         .reset-btn { background: #ff4444; color: white; }
+
+        /* PRINT STYLE */
+        @media print {
+            body * { visibility: hidden; }
+            #printArea, #printArea * { visibility: visible; }
+            #printArea {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                color: #000;
+                background: #fff;
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
 <h2>🥛 Sonu Milk Shop</h2>
-
 <div class="date" id="date"></div>
 
 <div id="items"></div>
@@ -122,14 +121,18 @@
     Total: ₹ <span id="total">0.00</span>
 </div>
 
-<button class="main print-btn" onclick="printBill()">🧾 Print Bill</button>
-<button class="main reset-btn" onclick="resetAll()">Reset</button>
+<button class="print-btn" onclick="printBill()">🧾 Print / Share Bill</button>
+<button class="reset-btn" onclick="resetAll()">Reset</button>
+
+<!-- 🔥 Hidden Print Area -->
+<div id="printArea" style="display:none;"></div>
 
 <script>
 
 // Date
 document.getElementById("date").innerText = new Date().toLocaleString();
 
+// Data
 const data = [
     {name: "Full Cream", price: 68},
     {name: "Cow Milk", price: 58},
@@ -137,18 +140,18 @@ const data = [
     {name: "Medium Dahi", price: 90},
     {name: "Badi Dahi", price: 66},
     {name: "Plain Lassi", price: 19},
-    {name: "Sweet Lassi", price: 19},
     {name: "Tadka Lassi", price: 19},
+    {name: "Sweet Lassi", price: 19},
     {name: "Baccha Dudh", price: 45},
     {name: "Bottle Lassi", price: 18}
 ];
 
 const container = document.getElementById("items");
 
+// Load items
 data.forEach((item, i) => {
     container.innerHTML += `
         <div class="item">
-
             <div class="left">
                 <div class="name">${item.name}</div>
                 <div class="price">₹${item.price}</div>
@@ -159,11 +162,11 @@ data.forEach((item, i) => {
                 <input type="number" id="q${i}" class="qty" value="0" oninput="calculate()">
                 <button class="btn" onclick="changeQty(${i}, 1)">+</button>
             </div>
-
         </div>
     `;
 });
 
+// Change qty
 function changeQty(i, change) {
     let el = document.getElementById(`q${i}`);
     let val = parseFloat(el.value) || 0;
@@ -173,6 +176,7 @@ function changeQty(i, change) {
     calculate();
 }
 
+// Calculate
 function calculate() {
     let total = 0;
     data.forEach((item, i) => {
@@ -182,6 +186,7 @@ function calculate() {
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
+// 🔥 PRINT FUNCTION (NO REDIRECT)
 function printBill() {
     let now = new Date().toLocaleString();
     let total = 0;
@@ -192,33 +197,43 @@ function printBill() {
         if (qty > 0) {
             let amt = qty * item.price;
             total += amt;
-            rows += `<tr>
-                        <td>${item.name}</td>
-                        <td>${qty}</td>
-                        <td>₹${amt}</td>
-                     </tr>`;
+            rows += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>${qty}</td>
+                    <td>₹${amt.toFixed(2)}</td>
+                </tr>`;
         }
     });
 
-    const html = `
-    <html>
-    <body style="font-family:Arial">
-    <h3 style="text-align:center">Sonu Milk Shop</h3>
-    <p>Date: ${now}</p>
-    <table style="width:100%; font-size:14px;">
-    <tr><th>Item</th><th>Qty</th><th>Amount</th></tr>
-    ${rows}
-    </table>
-    <h3>Total: ₹${total.toFixed(2)}</h3>
-    </body>
-    </html>`;
+    const billHTML = `
+        <h3 style="text-align:center;">Sonu Milk Shop</h3>
+        <p>Date: ${now}</p>
+        <table style="width:100%; border-collapse: collapse;">
+            <tr>
+                <th style="border-bottom:1px dashed;">Item</th>
+                <th style="border-bottom:1px dashed;">Qty</th>
+                <th style="border-bottom:1px dashed;">Amount</th>
+            </tr>
+            ${rows}
+        </table>
+        <h3>Total: ₹${total.toFixed(2)}</h3>
+        <p style="text-align:center;">🙏 Thank You Visit Again</p>
+    `;
 
-    let win = window.open("", "", "width=300,height=600");
-    win.document.write(html);
-    win.document.close();
-    win.print();
+    const printDiv = document.getElementById("printArea");
+    printDiv.innerHTML = billHTML;
+    printDiv.style.display = "block";
+
+    window.print();
+
+    // वापस hide (no reload needed)
+    setTimeout(() => {
+        printDiv.style.display = "none";
+    }, 500);
 }
 
+// Reset
 function resetAll() {
     data.forEach((_, i) => {
         document.getElementById(`q${i}`).value = 0;
